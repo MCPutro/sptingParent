@@ -7,7 +7,8 @@ on:
 
 jobs:
   build_and_deploy_product:
-    if: contains(github.event.head_commit.modified, 'Product-Service/')
+#    if: contains(github.event.head_commit.modified, 'Product-Service/')
+    if: contains(github.event.commits.modified[*], 'Product-Service/')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

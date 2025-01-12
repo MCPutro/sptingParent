@@ -13,16 +13,6 @@ build_product_service:
   only:
     changes:
       - Product-Service/**/*
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "uat"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "test"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-      when: on_success
-    - when: never
 
 build_user_service:
   stage: build
@@ -32,16 +22,6 @@ build_user_service:
   only:
     changes:
       - User-Service/**/*
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "uat"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "test"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-      when: on_success
-    - when: never
 
 # Deploy Job for Microservice 1
 deploy_product_service:
@@ -51,16 +31,6 @@ deploy_product_service:
   only:
     changes:
       - Product-Service/**/*
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "uat"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "test"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-      when: on_success
-    - when: never
 
 # Deploy Job for Microservice 1
 deploy_user_service:
@@ -70,13 +40,3 @@ deploy_user_service:
   only:
     changes:
       - User-Service/**/*
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "uat"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "test"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-      when: on_success
-    - when: never

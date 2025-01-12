@@ -21,7 +21,7 @@ jobs:
       - name: Check if Product-Service has changes
         id: product_service_check
         run: |
-          git fetch origin main
+          git fetch origin master
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- 'Product-Service/**')
           echo "Changed files: $CHANGED_FILES"
           if [[ -z "$CHANGED_FILES" ]]; then

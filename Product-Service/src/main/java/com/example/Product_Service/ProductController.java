@@ -15,7 +15,7 @@ public class ProductController {
     public List<Product> getProducts() {
         if (products == null) {
             products = new ArrayList<>();
-            this.products.add(new Product(1,"piring1",123));
+            this.products.add(new Product(1,"piring pecah",123));
             this.products.add(new Product(2,"gelas",123));
             this.products.add(new Product(3,"sendok",123));
             this.products.add(new Product(4,"garpu",123));

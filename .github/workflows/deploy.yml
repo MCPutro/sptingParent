@@ -2,7 +2,7 @@ name: deploy microservice spring
 
 on:
   push:
-    branch: [master]
+    branches: [ master ]
     paths:
       - 'Product-Service/**'
       - 'User-Service/**'
@@ -11,7 +11,7 @@ env:
   DEPLOY_PATH: "/home/mcputro/Backend/Spring"
   SSH_PORT: '22'
 
-job:
+jobs:
   build_and_deploy_product_service:
     if: ${{ github.event.head_commit.modified_files && contains(github.event.head_commit.modified_files, 'Product-Service') }}  # Check if Product-Service was modified
     env:
@@ -68,11 +68,13 @@ job:
         run: |
           echo "Deploying application..."
           ssh -p $SSH_PORT ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} << EOF
-#            killall ${{ env.SERVICE_NAME }}
-            cd ${{ env.DEPLOY_PATH }} 
-#            nohup java -jar ${{ env.DEPLOY_PATH }} .jar > app.log 2>&1 &
-            mkdir ${{ env.DEPLOY_PATH }} 
+            cd ${{ env.DEPLOY_PATH }}
+            mkdir ${{ env.DEPLOY_PATH }}
           EOF
+  #            killall ${{ env.SERVICE_NAME }}
+  #            cd ${{ env.DEPLOY_PATH }}
+  #            nohup java -jar ${{ env.DEPLOY_PATH }} .jar > app.log 2>&1 &
+  #           EOF
 
   build_and_deploy_user_service:
     if: ${{ github.event.head_commit.modified_files && contains(github.event.head_commit.modified_files, 'User-Service') }}  # Check if User-Service was modified

@@ -2,8 +2,8 @@ on:
   push:
     branches: [ master ]
     paths:
-      - 'Product-Service/**'
-      - 'User-Service/**'
+      - Product-Service/**
+      - User-Service/**
 
 jobs:
   build_and_deploy_product:

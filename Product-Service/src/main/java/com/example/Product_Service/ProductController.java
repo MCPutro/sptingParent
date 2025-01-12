@@ -17,7 +17,7 @@ public class ProductController {
             products = new ArrayList<>();
             this.products.add(new Product(1,"piring pecah lagi asdasd",123));
             this.products.add(new Product(2,"gelas 1s",123));
-            this.products.add(new Product(3,"sendok",123));
+            this.products.add(new Product(3,"sendok asd",123));
             this.products.add(new Product(4,"garpu",123));
         }
 

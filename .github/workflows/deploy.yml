@@ -1,0 +1,131 @@
+name: deploy microservice spring
+
+on:
+  push:
+    branch: [master]
+    paths:
+      - 'Product-Service/**'
+      - 'User-Service/**'
+
+env:
+  DEPLOY_PATH: "/home/mcputro/Backend/Spring"
+  SSH_PORT: '22'
+
+job:
+  build_and_deploy_product_service:
+    if: ${{ github.event.head_commit.modified_files && contains(github.event.head_commit.modified_files, 'Product-Service') }}  # Check if Product-Service was modified
+    env:
+      SERVICE_NAME: 'Product-Service'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'oracle'
+
+      - name: Build Product-Service with Maven
+        run: cd ${{ env.SERVICE_NAME }} && mvn clean install -DskipTests
+
+      - name: Setup SSH
+        run: |
+          # bikin folder .ssh
+          mkdir -p ~/.ssh
+          
+          # bikin file id_rsa
+          echo "${{ vars.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa || { echo "Failed to create id_rsa"; exit 1; }          
+          # echo "${{ vars.SSH_PRIVATE_KEY_B64 }}" | base64 -d | tr -d '\r' > ~/.ssh/id_rsa || { echo "Failed to create id_rsa"; exit 1; }
+          
+          # update permission
+          chmod 600 ~/.ssh/id_rsa || { echo "Failed to chmod 600"; exit 1; }
+          chmod 700 ~/.ssh || { echo "Failed to chmod 700"; exit 1; }
+          
+          # SSH agent
+          eval $(ssh-agent -s) || { echo "Failed to ssh agent"; exit 1; } # cara 1
+          # ssh-agent -a $SSH_AUTH_SOCK > /dev/null || { echo "Failed to ssh agent"; exit 1; } # cara 2
+          
+          # menambahakn id_rsa + pass ke ssh agent
+          echo "${{ vars.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa || { echo "Failed to add SSH key"; exit 1; }
+          
+          # berhubungan dg cara 2
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+          
+          # add known hosts to avoid host verification issues
+          ssh-keyscan -p $SSH_PORT "${{ vars.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy Product-Service to VPS
+        run: |
+          scp -i ~/.ssh/id_rsa ${{ env.SERVICE_NAME }}/target/*.jar ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ env.DEPLOY_PATH }}
+          
+      - name: Run Program
+        run: |
+          echo "Deploying application..."
+          ssh -p $SSH_PORT ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} << EOF
+#            killall ${{ env.SERVICE_NAME }}
+            cd ${{ env.DEPLOY_PATH }} 
+#            nohup java -jar ${{ env.DEPLOY_PATH }} .jar > app.log 2>&1 &
+            mkdir ${{ env.DEPLOY_PATH }} 
+          EOF
+
+  build_and_deploy_user_service:
+    if: ${{ github.event.head_commit.modified_files && contains(github.event.head_commit.modified_files, 'User-Service') }}  # Check if User-Service was modified
+    env:
+      SERVICE_NAME: 'User-Service'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'oracle'
+
+      - name: Build Product-Service with Maven
+        run: cd ${{ env.SERVICE_NAME }} && mvn clean install -DskipTests
+
+      - name: Setup SSH
+        run: |
+          # bikin folder .ssh
+          mkdir -p ~/.ssh
+          
+          # bikin file id_rsa
+          echo "${{ vars.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa || { echo "Failed to create id_rsa"; exit 1; }          
+          # echo "${{ vars.SSH_PRIVATE_KEY_B64 }}" | base64 -d | tr -d '\r' > ~/.ssh/id_rsa || { echo "Failed to create id_rsa"; exit 1; }
+          
+          # update permission
+          chmod 600 ~/.ssh/id_rsa || { echo "Failed to chmod 600"; exit 1; }
+          chmod 700 ~/.ssh || { echo "Failed to chmod 700"; exit 1; }
+          
+          # SSH agent
+          eval $(ssh-agent -s) || { echo "Failed to ssh agent"; exit 1; } # cara 1
+          # ssh-agent -a $SSH_AUTH_SOCK > /dev/null || { echo "Failed to ssh agent"; exit 1; } # cara 2
+          
+          # menambahakn id_rsa + pass ke ssh agent
+          echo "${{ vars.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa || { echo "Failed to add SSH key"; exit 1; }
+          
+          # berhubungan dg cara 2
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+          
+          # add known hosts to avoid host verification issues
+          ssh-keyscan -p $SSH_PORT "${{ vars.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy Product-Service to VPS
+        run: |
+          scp -i ~/.ssh/id_rsa ${{ env.SERVICE_NAME }}/target/*.jar ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ env.DEPLOY_PATH }}
+
+      - name: Run Program
+        run: |
+          echo "Deploying application..."
+          ssh -p $SSH_PORT ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} << EOF
+          #            killall ${{ env.SERVICE_NAME }}
+          cd ${{ env.DEPLOY_PATH }}
+          #            nohup java -jar ${{ env.DEPLOY_PATH }} .jar > app.log 2>&1 &
+          mkdir ${{ env.DEPLOY_PATH }}
+          EOF

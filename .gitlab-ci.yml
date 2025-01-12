@@ -1,0 +1,42 @@
+stages:
+  - build
+  - deploy
+
+# Image untuk menjalankan proses CI
+image: maven:3.9.9-amazoncorretto-21
+
+build_product_service:
+  stage: build
+  script:
+    - echo "Building Product-Service"
+    - cd Product-Service && mvn clean install -DskipTests
+  only:
+    changes:
+      - Product-Service/**
+
+build_user_service:
+  stage: build
+  script:
+    - echo "Building User-Service1"
+    - cd User-Service && mvn clean install -DskipTests
+  only:
+    changes:
+      - User-Service/**
+
+# Deploy Job for Microservice 1
+deploy_product_service:
+  stage: deploy
+  script:
+    - echo "Deploying Product-Service to VPS"
+  only:
+    changes:
+      - Product-Service/**
+
+# Deploy Job for Microservice 1
+deploy_user_service:
+  stage: deploy
+  script:
+    - echo "Deploying User-Service to VPS"
+  only:
+    changes:
+      - User-Service/**

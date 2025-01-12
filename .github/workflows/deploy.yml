@@ -6,7 +6,6 @@ on:
 
 jobs:
   build_and_deploy:
-    if: contains(github.event.head_commit.message, 'Product-Service') || contains(github.event.head_commit.modified, 'Product-Service')
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -19,5 +18,18 @@ jobs:
         with:
           java-version: '21'
           distribution: 'oracle'
+      - name: Check if Product-Service has changes
+        id: product_service_check
+        run: |
+          git fetch origin main
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- 'Product-Service/**')
+          echo "Changed files: $CHANGED_FILES"
+          if [[ -z "$CHANGED_FILES" ]]; then
+            echo "No changes detected in Product-Service"
+            echo "skip=true" >> $GITHUB_ENV
+          else
+            echo "Changes detected in Product-Service"
+            echo "skip=false" >> $GITHUB_ENV
+          fi
       - name: Build microservice with Maven
         run: cd ${{ matrix.microservice }} && mvn clean install -DskipTests

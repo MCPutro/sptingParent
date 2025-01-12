@@ -11,7 +11,8 @@ build_product_service:
     - echo "Building Product-Service"
     - cd Product-Service && mvn clean install -DskipTests
   only:
-    changes:
+    - master
+    - changes:
       - Product-Service/**/*
 
 build_user_service:
@@ -20,7 +21,8 @@ build_user_service:
     - echo "Building User-Service1"
     - cd User-Service && mvn clean install -DskipTests
   only:
-    changes:
+    - master
+    - changes:
       - User-Service/**/*
 
 # Deploy Job for Microservice 1
@@ -29,7 +31,8 @@ deploy_product_service:
   script:
     - echo "Deploying Product-Service to VPS"
   only:
-    changes:
+    - master
+    - changes:
       - Product-Service/**/*
 
 # Deploy Job for Microservice 1
@@ -38,5 +41,6 @@ deploy_user_service:
   script:
     - echo "Deploying User-Service to VPS"
   only:
-    changes:
+    - master
+    - changes:
       - User-Service/**/*

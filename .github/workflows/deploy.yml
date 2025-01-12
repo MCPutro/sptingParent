@@ -2,14 +2,14 @@ on:
   push:
     branches: [ master ]
     paths:
-      - '*-Service/**'  # Trigger deployment for any microservice directory if changed
+      - User-Service/**
+      - Product-Service/**
+
 
 jobs:
   build_and_deploy:
+    if: contains(github.event.head_commit.message, 'Product-Service') || github.event_name == 'push' && github.event.changes[0].path startsWith 'Product-Service/'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        microservice: ['User-Service', 'Product-Service']
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,18 +18,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'oracle'
-      - name: Check if Product-Service has changes
-        id: product_service_check
-        run: |
-          git fetch origin master
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- 'Product-Service/**')
-          echo "Changed files: $CHANGED_FILES"
-          if [[ -z "$CHANGED_FILES" ]]; then
-            echo "No changes detected in Product-Service"
-            echo "skip=true" >> $GITHUB_ENV
-          else
-            echo "Changes detected in Product-Service"
-            echo "skip=false" >> $GITHUB_ENV
-          fi
       - name: Build microservice with Maven
-        run: cd ${{ matrix.microservice }} && mvn clean install -DskipTests
+        run: |
+          cd Product-Service
+          mvn clean package

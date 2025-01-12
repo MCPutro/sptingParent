@@ -2,7 +2,7 @@ on:
   push:
     branches: [ master ]
     paths:
-      - '*-Service-*/**'  # Trigger deployment for any microservice directory if changed
+      - '*-Service/**'  # Trigger deployment for any microservice directory if changed
 
 jobs:
   build_and_deploy:

@@ -64,7 +64,6 @@ job:
           # Menyalin file binary dari GitHub Actions ke VPS
           #scp -i ~/.ssh/id_rsa ${{ env.APP_NAME }}.tar.gz ${{ vars.SSH_USER }}@${{ vars.SSH_HOST  }}:${{ env.DEPLOY_PATH }}
           scp -i ~/.ssh/id_rsa ${{ env.SERVICE_NAME }}/target/*.jar ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ env.DEPLOY_PATH }}
-          
       - name: Run Program
         run: |
           echo "Deploying application..."
